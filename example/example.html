@@ -18,6 +18,7 @@
     </form>
 
     <script>
+      // Create a hook on toggle links to toggle the siblinged paragraph on and off
       Hooks.add("a.toggle", function(toggle_link) {
 	toggle_link.click(function(e) {
 	  e.preventDefault();
@@ -26,16 +27,19 @@
 	});
       });
 
+      // Make sure that clicking the form submit button reads the form and adds it to the list
       Hooks.add("form", function(form) {
 	form.find(":submit").click(function(e) {
 	  e.preventDefault();
 
 	  var value = form.find(":input").val();
 
+	  // let's create a new li dom element
 	  var li = jQuery("<li>");
 	  li.append('<a href="#" class="toggle">toggle</a>').append("<p>"+value+"</p>");
 	  jQuery("ul.comments").append(li);
 
+	  // now run all the hooks against the newly created dom element to enable the js behavior
 	  Hooks.run(li);
 	});
       });
