@@ -1,0 +1,54 @@
+= Hooker - A small utility to specify js hooks so they can be run on newly added html
+
+= Motivation
+
+I am a great proponent of the unobtrusive javascript approach, which boils down to two things:
+ * Create a dom structure with various css classes
+ * Hook in javascript functionality into dom elements via those css classes
+
+The second step usually boils down to something like:
+
+  // Make the toggle link toggle the sibling paragraph
+  jQuery(document).ready(function() {
+    jQuery("a.toggle").click(function(e) {
+      e.preventDefault();'
+
+      e.siblings("p").toggle();
+    });
+  });
+
+This approach works great until someone does something like:
+
+  // somewhere else in code...
+  var li = jQuery("<li>").append(jQuery('<a class="toggle">toggle</a>'));
+  jQuery("ul.comments").append(li);
+
+Since the hook is run only during the loading of the document the newly created link won't have the js functionality anymore, making it useless. Solution?
+
+  // Define a hook for toggle anchors
+  Hooks.add("a.toggle", function(link) {
+    link.click(function(e) {
+      e.preventDefault();
+
+      e.sublings("p").toggle();
+    });
+  });
+
+  // When creating a new element, run the hooks on it
+  var li = jQuery("<li>").append(jQuery('<a class="toggle">toggle</a>'));
+  jQuery("ul.comments").append(li);
+
+  // run all the defined hooks on the created li
+  Hooks.run(li);
+
+Voila!
+
+You can view the example in <tt>examples/example.html</tt>
+
+= Live events
+
+But what about jQuery live events, you may ask?
+
+While the live events can certainly do the job here, if you have something more significant that should happen when the newly generated stuff is created, it won't work.
+For example, I commonly ajaxify forms by creating a js object to maintain the state and other things of the dom and doesn't reduce to clicks and other simple events that could
+have been made live. Sorry. :(
